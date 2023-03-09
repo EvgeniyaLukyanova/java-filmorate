@@ -6,19 +6,29 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Component
 class UserValidateServiceTest {
 
-    UserRepository repository;
-    UserValidateService validateService;
+    private UserRepository repository;
+    private UserValidateService validateService;
+    private static Validator validator;
 
     @BeforeEach
     public void beforeEach(){
         repository = new UserRepository();
         validateService = new UserValidateService(repository);
+
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.usingContext().getValidator();
     }
 
     @Test
@@ -29,6 +39,8 @@ class UserValidateServiceTest {
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946,8,20));
         validateService.validate(user);
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(0, violations.size());
     }
 
     @Test
@@ -38,30 +50,54 @@ class UserValidateServiceTest {
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946,8,20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateService.validate(user));
-        assertEquals("Адрес электронной почты не может быть пустым.", exception.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Адрес электронной почты не может быть пустым.");
     }
 
     @Test
-    public void invalidEmailTest() {
+    public void nullEmailTest() {
+        User user = new User();
+        user.setEmail(null);
+        user.setLogin("dolore");
+        user.setName("Nick Name");
+        user.setBirthday(LocalDate.of(1946,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Адрес электронной почты не может быть пустым.");
+    }
+
+    @Test
+    public void noCorrectEmailTest() {
         User user = new User();
         user.setEmail("mailmail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946,8,20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateService.validate(user));
-        assertEquals("Неверный формат адреса электронной почты.", exception.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Неверный формат адреса электронной почты.");
+    }
+
+    @Test
+    public void blankLoginTest() {
+        User user = new User();
+        user.setLogin(" ");
+        user.setEmail("mail@mail.ru");
+        user.setName("Nick Name");
+        user.setBirthday(LocalDate.of(1946,8,20));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(2, violations.size(), "Логин не может быть пустым.");
     }
 
     @Test
     public void emptyLoginTest() {
         User user = new User();
+        user.setLogin("");
         user.setEmail("mail@mail.ru");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946,8,20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateService.validate(user));
-        assertEquals("Логин не может быть пустым.", exception.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(2, violations.size(), "Логин не может быть пустым.");
     }
+
     @Test
     public void loginWithSpaceTest() {
         User user = new User();
@@ -69,8 +105,8 @@ class UserValidateServiceTest {
         user.setLogin("dolore ullamco");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(1946,8,20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateService.validate(user));
-        assertEquals("Логин содержит пробелы.", exception.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Логин не может содержать пробелы.");
     }
 
     @Test
@@ -90,8 +126,8 @@ class UserValidateServiceTest {
         user.setLogin("dolore");
         user.setName("Nick Name");
         user.setBirthday(LocalDate.of(2446,8,20));
-        ValidationException exception = assertThrows(ValidationException.class, () -> validateService.validate(user));
-        assertEquals("Дата рождения не может быть в будущем.", exception.getMessage());
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertEquals(1, violations.size(), "Дата рождения не может быть в будущем.");
     }
 
     @Test

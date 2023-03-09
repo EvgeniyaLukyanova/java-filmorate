@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.service.UserValidateService;
+
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -12,8 +14,8 @@ import java.util.Collection;
 @Slf4j
 public class UserController {
 
-    UserRepository repository;
-    UserValidateService validateService;
+    final UserRepository repository;
+    final UserValidateService validateService;
 
     public UserController() {
         repository = new UserRepository();
@@ -21,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         log.info("Начинаем добавлять пользователя: {}", user);
         validateService.validate(user);
         repository.crateUser(user);
@@ -30,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User put(@RequestBody User user) {
+    public User put(@Valid @RequestBody User user) {
         log.info("Начинаем обновлять пользователя: {}", user);
         validateService.validate(user);
         repository.updateUser(user);
