@@ -23,9 +23,11 @@ public class FilmValidateService {
                 throw new ValidationException("Фильм \"" + film.getName() + "\" отсутствует в базе.");
             }
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("Дата релиза должны быть не раньше 28 декабря 1895 года: {}", film);
-            throw new ValidationException("Дата релиза должны быть не раньше 28 декабря 1895 года.");
+        if (film.getReleaseDate() != null) {
+            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                log.warn("Дата релиза должны быть не раньше 28 декабря 1895 года: {}", film);
+                throw new ValidationException("Дата релиза должны быть не раньше 28 декабря 1895 года.");
+            }
         }
     }
 }

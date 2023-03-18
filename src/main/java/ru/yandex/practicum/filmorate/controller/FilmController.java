@@ -13,8 +13,8 @@ import java.util.Collection;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    final FilmRepository repository;
-    final FilmValidateService validateService;
+    private final FilmRepository repository;
+    private final FilmValidateService validateService;
 
     public FilmController() {
         repository = new FilmRepository();

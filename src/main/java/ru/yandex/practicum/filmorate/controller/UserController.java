@@ -14,8 +14,8 @@ import java.util.Collection;
 @Slf4j
 public class UserController {
 
-    final UserRepository repository;
-    final UserValidateService validateService;
+    private final UserRepository repository;
+    private final UserValidateService validateService;
 
     public UserController() {
         repository = new UserRepository();
