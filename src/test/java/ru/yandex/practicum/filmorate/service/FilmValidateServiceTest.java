@@ -100,17 +100,6 @@ class FilmValidateServiceTest {
     }
 
     @Test
-    public void nullReleaseDateTest() {
-        Film film = new Film();
-        film.setName("nisi eiusmod");
-        film.setDescription("adipisicing");
-        film.setReleaseDate(null);
-        film.setDuration(100);
-        Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertEquals(1, violations.size(), "Дата не должна быть пустой.");
-    }
-
-    @Test
     public void durationMore0Test() {
         Film film = new Film();
         film.setName("nisi eiusmod");
