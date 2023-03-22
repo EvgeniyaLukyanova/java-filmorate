@@ -19,13 +19,17 @@ public class InMemoryFilmStorage implements FilmStorage{
 
     @Override
     public void crateFilm(Film film) {
-        film.setId(getUniqueId());
-        films.put(film.getId(), film);
+        if (film != null) {
+            film.setId(getUniqueId());
+            films.put(film.getId(), film);
+        }
     }
 
     @Override
     public void updateFilm(Film film) {
-        films.put(film.getId(), film);
+        if (film != null) {
+            films.put(film.getId(), film);
+        }
     }
 
     @Override

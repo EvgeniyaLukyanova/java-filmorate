@@ -19,13 +19,17 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void crateUser(User user) {
-        user.setId(getUniqueId());
-        users.put(user.getId(), user);
+        if (user != null) {
+            user.setId(getUniqueId());
+            users.put(user.getId(), user);
+        }
     }
 
     @Override
     public void updateUser(User user) {
-        users.put(user.getId(), user);
+        if (user != null) {
+            users.put(user.getId(), user);
+        }
     }
 
     @Override

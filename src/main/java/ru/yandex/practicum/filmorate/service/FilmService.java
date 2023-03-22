@@ -70,7 +70,12 @@ public class FilmService {
                 Set<Integer> setLikes = new HashSet<>();
                 film.setLikes(setLikes);
             }
-            film.getLikes().add(userId);
+
+            if (film.getLikes().add(userId)) {
+                int rating = film.getRating();
+                rating++;
+                film.setRating(rating);
+            }
         } else {
             if (filmStorage.getFilmById(id) == null) {
                 log.warn("Добавление лайка фильму с ид {}. Фильм отсутствует в базе.", id);
@@ -89,7 +94,11 @@ public class FilmService {
             User user = userStorage.getUserById(userId);
 
             if (film.getLikes() != null) {
-                film.getLikes().remove(userId);
+                if (film.getLikes().remove(userId)) {
+                    int rating = film.getRating();
+                    rating--;
+                    film.setRating(rating);
+                }
             }
         } else {
             if (filmStorage.getFilmById(id) == null) {
@@ -105,19 +114,25 @@ public class FilmService {
 
     public List<Film> getPopularFilms(Integer count) {
         int cnt = Optional.ofNullable(count).orElse(10);
+        System.out.println(filmStorage.getFilms());
         if (cnt > 0) {
             return filmStorage.getFilms().stream()
                     .sorted((Film o1, Film o2) -> {
-                        if (o1.getLikes() == null) {
-                            return 1;
-                        }
-                        if (o2.getLikes() == null) {
+//                        if (o1.getLikes() == null) {
+//                            return 1;
+//                        }
+//                        if (o2.getLikes() == null) {
+//                            return -1;
+//                        }
+//                        if (o1.getLikes().size() > o2.getLikes().size()) {
+//                            return 1;
+//                        } else {
+//                            return -1;
+//                        }
+                        if (o1.getRating() > o2.getRating()) {
                             return -1;
-                        }
-                        if (o1.getLikes().size() > o2.getLikes().size()) {
-                            return 1;
                         } else {
-                            return -1;
+                            return 1;
                         }
                         })
                     .limit(cnt)
