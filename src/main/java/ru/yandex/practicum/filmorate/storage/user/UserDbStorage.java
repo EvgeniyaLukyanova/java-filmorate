@@ -61,12 +61,7 @@ public class UserDbStorage implements UserStorage {
             String sqlQuery = "update \"users\" set " +
                     "\"login\" = ?, \"name\" = ?, \"email\" = ?, \"birthday\" = ? " +
                     "where \"id\" = ?";
-            jdbcTemplate.update(sqlQuery
-                    , user.getLogin()
-                    , user.getName()
-                    , user.getEmail()
-                    , user.getBirthday()
-                    , user.getId());
+            jdbcTemplate.update(sqlQuery, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
 
             List<Integer> friends = getFriends(user.getId());
 
@@ -97,7 +92,7 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "select * from \"users\" where \"id\" = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> mapRowToUser(resultSet), id);
-        } catch(EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
