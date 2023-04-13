@@ -21,7 +21,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate){
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -124,6 +124,8 @@ public class UserDbStorage implements UserStorage {
 
     public List<Integer> getFriends(int id) {
         String sqlQuery = "select \"user2_id\" from \"friends\" where \"user1_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> { return resultSet.getInt("user2_id");}, id);
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            return resultSet.getInt("user2_id");
+            }, id);
     }
 }

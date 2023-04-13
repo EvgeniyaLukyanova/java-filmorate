@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Qualifier("FilmDbStorage")
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -31,7 +31,7 @@ public class FilmDbStorage implements FilmStorage{
     @Autowired
     GenreStorage genreStorage;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate){
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -148,7 +148,7 @@ public class FilmDbStorage implements FilmStorage{
             }
 
             for (Integer id : genres) {
-                if (film.getGenres()!= null) {
+                if (film.getGenres() != null) {
                     if (!film.getGenres().stream()
                             .map(e -> e.getId())
                             .collect(Collectors.toList())
@@ -165,7 +165,7 @@ public class FilmDbStorage implements FilmStorage{
         String sqlQuery = "select * from \"films\" where \"id\" = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> mapRowToFilm(resultSet), id);
-        } catch(EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
@@ -188,7 +188,9 @@ public class FilmDbStorage implements FilmStorage{
 
     public List<Integer> getLikes(int id) {
         String sqlQuery = "select \"user_id\" from \"likes\" where \"film_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> { return resultSet.getInt("user_id");}, id);
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> { return
+                resultSet.getInt("user_id");
+            }, id);
     }
 
     public void addGenre(int filmId, int genreId) {
@@ -203,7 +205,9 @@ public class FilmDbStorage implements FilmStorage{
 
     public List<Integer> getGenres(int id) {
         String sqlQuery = "select \"genre_id\" from \"film_genres\" where \"film_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> { return resultSet.getInt("genre_id");}, id);
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            return resultSet.getInt("genre_id");
+            }, id);
     }
 
     private Genre mapRowToGenre(ResultSet resultSet) throws SQLException {
