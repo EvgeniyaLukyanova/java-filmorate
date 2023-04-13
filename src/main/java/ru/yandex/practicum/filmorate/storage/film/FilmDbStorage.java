@@ -188,8 +188,8 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Integer> getLikes(int id) {
         String sqlQuery = "select \"user_id\" from \"likes\" where \"film_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> { return
-                resultSet.getInt("user_id");
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
+            return resultSet.getInt("user_id");
             }, id);
     }
 
