@@ -13,7 +13,7 @@ import java.util.List;
 public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public MpaDbStorage(JdbcTemplate jdbcTemplate){
+    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -29,7 +29,7 @@ public class MpaDbStorage implements MpaStorage {
         String sqlQuery = "select * from \"mpa\" where \"id\" = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> mapRowToMpa(resultSet), id);
-        } catch(EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }

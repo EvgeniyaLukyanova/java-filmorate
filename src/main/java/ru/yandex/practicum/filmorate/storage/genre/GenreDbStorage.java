@@ -14,7 +14,7 @@ public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public GenreDbStorage(JdbcTemplate jdbcTemplate){
+    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -30,7 +30,7 @@ public class GenreDbStorage implements GenreStorage {
         String sqlQuery = "select * from \"genres\" where \"id\" = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, (resultSet, rowNum) -> mapRowToGenre(resultSet), id);
-        } catch(EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
