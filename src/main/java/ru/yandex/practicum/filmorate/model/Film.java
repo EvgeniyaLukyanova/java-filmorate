@@ -26,7 +26,9 @@ public class Film {
     Mpa mpa;
     List<Genre> genres;
 
-    public Film(){}
+    public Film() {
+
+    }
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rate, Set<Integer> likes, Mpa mpa, List<Genre> genres) {
         this.id = id;

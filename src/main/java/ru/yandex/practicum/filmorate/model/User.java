@@ -22,7 +22,9 @@ public class User {
     private LocalDate birthday;
     private List<Integer> friends = new ArrayList<>();
 
-    public User(){}
+    public User() {
+
+    }
 
     public User(int id, String login, String name, String email, LocalDate birthday, List<Integer> friends) {
         this.id = id;
