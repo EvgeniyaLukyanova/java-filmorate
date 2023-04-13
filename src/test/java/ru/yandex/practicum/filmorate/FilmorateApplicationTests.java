@@ -33,6 +33,7 @@ class FilmorateApplicationTests {
 	private final FilmDbStorage filmStorage;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
 	@AfterEach
 	void tearDown() {
 		jdbcTemplate.execute("delete from \"friends\"");
@@ -43,6 +44,7 @@ class FilmorateApplicationTests {
 		jdbcTemplate.execute("ALTER TABLE \"users\" ALTER COLUMN \"id\" RESTART WITH 1");
 		jdbcTemplate.execute("ALTER TABLE \"films\" ALTER COLUMN \"id\" RESTART WITH 1");
 	}
+
 	@Test
 	public void testCreateAndFindUserById() {
 		User user = new User();
@@ -86,6 +88,7 @@ class FilmorateApplicationTests {
 				() -> assertThat(u).hasFieldOrPropertyWithValue("birthday", LocalDate.of(1950,8,20))
 		));
 	}
+
 	@Test
 	public void testUpdateUserAddFriend() {
 		User user1 = new User();
@@ -169,7 +172,7 @@ class FilmorateApplicationTests {
 	public void testFindGenreById() {
 		Optional<Genre> genre = Optional.ofNullable(genreStorage.getGenreById(1));
 		assertThat(genre).isPresent()
-				.hasValueSatisfying(g -> assertThat(g.getName()).isIn( "Комедия", "Драма", "Мультфильм", "Триллер", "Документальный", "Боевик"));
+				.hasValueSatisfying(g -> assertThat(g.getName()).isIn("Комедия", "Драма", "Мультфильм", "Триллер", "Документальный", "Боевик"));
 	}
 
 	@Test
@@ -183,7 +186,7 @@ class FilmorateApplicationTests {
 	public void testFindMpaById() {
 		Optional<Mpa> mpa = Optional.ofNullable(mpaStorage.getMpaById(1));
 		assertThat(mpa).isPresent()
-				.hasValueSatisfying(m -> assertThat(m.getName()).isIn( "G", "PG", "PG-13", "R", "NC-17"));
+				.hasValueSatisfying(m -> assertThat(m.getName()).isIn("G", "PG", "PG-13", "R", "NC-17"));
 	}
 
 	@Test
