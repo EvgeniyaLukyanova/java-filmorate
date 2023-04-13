@@ -15,13 +15,12 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-
     private UserStorage userStorage;
     private UserService userService;
     private static Validator validator;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         userStorage = new InMemoryUserStorage();
         userService = new UserService(userStorage);
 

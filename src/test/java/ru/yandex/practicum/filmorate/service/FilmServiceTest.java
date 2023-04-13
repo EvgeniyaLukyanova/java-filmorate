@@ -20,14 +20,13 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmServiceTest {
-
     private FilmStorage filmStorage;
     private UserStorage userStorage;
     private FilmService filmService;
     private static Validator validator;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         filmService = new FilmService(filmStorage, userStorage);
