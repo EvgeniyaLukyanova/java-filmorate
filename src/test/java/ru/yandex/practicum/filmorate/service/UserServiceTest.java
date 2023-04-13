@@ -221,10 +221,7 @@ class UserServiceTest {
         assertEquals(2, users.size(), "Неверное количество пользователей.");
         assertNotNull(users.get(0).getFriends(), "Нет друзей у пользователя");
         assertEquals(1, users.get(0).getFriends().size(), "Неверное количество друзей.");
-        assertTrue(users.get(0).getFriends().contains(users.get(1).getId()), "Неверный друг у пользователся");
-        assertNotNull(users.get(1).getFriends(), "Нет друзей у пользователя");
-        assertEquals(1, users.get(1).getFriends().size(), "Неверное количество друзей.");
-        assertTrue(users.get(1).getFriends().contains(users.get(0).getId()), "Неверный друг у пользователся");
+        assertTrue(users.get(0).getFriends().contains(users.get(1).getId()), "Неверный друг у пользователя");
     }
 
     @Test

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -20,7 +21,7 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("FilmDbStorage")FilmStorage filmStorage, @Qualifier("UserDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -62,74 +63,60 @@ public class FilmService {
     }
 
     public void addLike(int id, int userId) {
-        if (filmStorage.getFilmById(id) != null && userStorage.getUserById(userId) != null) {
-            Film film = filmStorage.getFilmById(id);
-            User user = userStorage.getUserById(userId);
+        Film film = filmStorage.getFilmById(id);
+        if (film == null) {
+            log.warn("Добавление лайка фильму с ид {}. Фильм отсутствует в базе.", id);
+            throw new NotFoundException(String.format("Фильм с ид %s не найден", id));
+        }
 
-            if (film.getLikes() == null) {
-                Set<Integer> setLikes = new HashSet<>();
-                film.setLikes(setLikes);
-            }
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.warn("Добавление лайка фильму с ид {}. Пользователь с ид {} не найден", id, userId);
+            throw new NotFoundException(String.format("Пользователь с ид %s не найден", id));
+        }
 
-            if (film.getLikes().add(userId)) {
-                int rating = film.getRating();
-                rating++;
-                film.setRating(rating);
-            }
-        } else {
-            if (filmStorage.getFilmById(id) == null) {
-                log.warn("Добавление лайка фильму с ид {}. Фильм отсутствует в базе.", id);
-                throw new NotFoundException(String.format("Фильм с ид %s не найден", id));
-            }
-            if (userStorage.getUserById(userId) == null) {
-                log.warn("Добавление лайка фильму с ид {}. Пользователь с ид {} не найден", id, userId);
-                throw new NotFoundException(String.format("Пользователь с ид %s не найден", id));
-            }
+        if (film.getLikes() == null) {
+            Set<Integer> setLikes = new HashSet<>();
+            film.setLikes(setLikes);
+        }
+
+        if (film.getLikes().add(userId)) {
+            filmStorage.updateFilm(film);
         }
     }
 
     public void deleteLike(int id, int userId) {
-        if (filmStorage.getFilmById(id) != null && userStorage.getUserById(userId) != null) {
-            Film film = filmStorage.getFilmById(id);
-            User user = userStorage.getUserById(userId);
+        Film film = filmStorage.getFilmById(id);
+        if (film == null) {
+            log.warn("Удаление лайка у фильма с ид {}. Фильм отсутствует в базе.", id);
+            throw new NotFoundException(String.format("Фильм с ид %s не найден", id));
+        }
 
-            if (film.getLikes() != null) {
-                if (film.getLikes().remove(userId)) {
-                    int rating = film.getRating();
-                    rating--;
-                    film.setRating(rating);
-                }
-            }
-        } else {
-            if (filmStorage.getFilmById(id) == null) {
-                log.warn("Удаление лайка у фильма с ид {}. Фильм отсутствует в базе.", id);
-                throw new NotFoundException(String.format("Фильм с ид %s не найден", id));
-            }
-            if (userStorage.getUserById(userId) == null) {
-                log.warn("Удвлкние лайка у фильма с ид {}. Пользователь с ид {} отсутствует в базе", id, userId);
-                throw new NotFoundException(String.format("Пользователь с ид %s не найден", id));
+        User user = userStorage.getUserById(userId);
+        if (user == null) {
+            log.warn("Удвлкние лайка у фильма с ид {}. Пользователь с ид {} отсутствует в базе", id, userId);
+            throw new NotFoundException(String.format("Пользователь с ид %s не найден", id));
+        }
+
+        if (film.getLikes() != null) {
+            if (film.getLikes().remove(userId)) {
+                filmStorage.updateFilm(film);
             }
         }
     }
 
     public List<Film> getPopularFilms(Integer count) {
         int cnt = Optional.ofNullable(count).orElse(10);
-        System.out.println(filmStorage.getFilms());
         if (cnt > 0) {
             return filmStorage.getFilms().stream()
                     .sorted((Film o1, Film o2) -> {
-//                        if (o1.getLikes() == null) {
-//                            return 1;
-//                        }
-//                        if (o2.getLikes() == null) {
-//                            return -1;
-//                        }
-//                        if (o1.getLikes().size() > o2.getLikes().size()) {
-//                            return 1;
-//                        } else {
-//                            return -1;
-//                        }
-                        if (o1.getRating() > o2.getRating()) {
+                        if (o1.getLikes() == null) {
+                            return 1;
+                        }
+                        if (o2.getLikes() == null) {
+                            return -1;
+                        }
+                        if (o1.getLikes().size() > o2.getLikes().size()) {
                             return -1;
                         } else {
                             return 1;

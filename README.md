@@ -44,65 +44,13 @@ select login, name, email, birthday from users u
 #### Получение пользователя по ид:
 select login, name, email, birthday from users u where id = 1;
 #### Добавление в друзья:
-insert into friends (user1_id, user2_id, confirmation) values (1, 2, false);
+insert into friends (user1_id, user2_id, confirmation) values (1, 2, true);
 #### Удаление из друзей:
-delete from friends where user1_id in (1,2) and user2_id in (1,2);
+delete from friends where user1_id = 1 and user2_id = 2
 #### Получение друзей пользователя:
 select u2.login, u2.name, u2.email, u2.birthday
 from friends f
 inner join users u1 on u1.id = f.user1_id
 inner join users u2 on u2.id = f.user2_id
 where f.confirmation = true
-and f.user1_id = 1
-union
-select u1.login, u1.name, u1.email, u1.birthday
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = true
-and f.user2_id = 1
-#### Получение общих друзей:
-select u2.id, u2.login, u2.name, u2.email, u2.birthday
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user1_id = 1
-and u2.id in (select u2.id
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user1_id = 3
-union
-select u1.id
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user2_id = 3)
-union
-select u1.id, u1.login, u1.name, u1.email, u1.birthday
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user2_id = 1
-and u1.id in (select u2.id
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user1_id = 3
-union
-select u1.id
-from friends f
-inner join users u1 on u1.id = f.user1_id
-inner join users u2 on u2.id = f.user2_id
-where f.confirmation = false
-and f.user2_id = 3)
-
-
-
-
-
+and f.user1_id = 1;

@@ -27,7 +27,7 @@ public class UserController {
         userService.validate(user);
         userService.crateUser(user);
         log.info("Пользователь добавлен: {}", user);
-        return user;
+        return userService.getUserById(user.getId());
     }
 
     @PutMapping
@@ -36,7 +36,7 @@ public class UserController {
         userService.validate(user);
         userService.updateUser(user);
         log.info("Пользователь обнавлен: {}", user);
-        return user;
+        return userService.getUserById(user.getId());
     }
 
     @GetMapping
