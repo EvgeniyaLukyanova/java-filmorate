@@ -4,11 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -40,8 +42,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.validate(film);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(0, violations.size());
@@ -52,8 +55,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName(" ");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.validate(film);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size(), "Название фильма не может быть пустым.");
@@ -64,8 +68,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.validate(film);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size(), "Название фильма не может быть пустым.");
@@ -76,8 +81,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName(null);
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.validate(film);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size(), "Название фильма не может быть пустым.");
@@ -90,6 +96,7 @@ class FilmServiceTest {
         film.setDescription("Пятеро друзей ( комик-группа «Шарло»), приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия», стал кандидатом Коломбани.");
         film.setReleaseDate(LocalDate.of(1900, 3, 25));
         film.setDuration(200);
+        film.setMpa(new Mpa(1, "G"));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size(), "Максимальная длина описания не должна превышать 200 символов.");
     }
@@ -99,8 +106,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1890,3,25));
+        film.setReleaseDate(LocalDate.of(1890, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         ValidationException exception = assertThrows(ValidationException.class, () -> filmService.validate(film));
         assertEquals("Дата релиза должны быть не раньше 28 декабря 1895 года.", exception.getMessage());
     }
@@ -110,8 +118,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(-200);
+        film.setMpa(new Mpa(1, "G"));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertEquals(1, violations.size(), "Продолжительность фильма должна быть положительной.");
     }
@@ -121,8 +130,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         int filmId = film.getId();
         Film savedFilm = filmStorage.getFilmById(filmId);
@@ -139,12 +149,13 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         film.setName("nisi eiusmod new");
         film.setDescription("adipisicing new");
-        film.setReleaseDate(LocalDate.of(1970,3,25));
+        film.setReleaseDate(LocalDate.of(1970, 3, 25));
         film.setDuration(200);
         filmService.updateFilm(film);
         int filmId = film.getId();
@@ -157,7 +168,7 @@ class FilmServiceTest {
         assertEquals("nisi eiusmod new", films.get(0).getName(), "Не изменилось наименование фильма.");
         assertEquals("adipisicing new", films.get(0).getDescription(), "Не изменилось опимание фильма.");
         assertEquals(200, films.get(0).getDuration(), "Не изменилась продолжительности фильма.");
-        assertEquals(LocalDate.of(1970,3,25), films.get(0).getReleaseDate(), "Не изменилась дата релиза.");
+        assertEquals(LocalDate.of(1970, 3, 25), films.get(0).getReleaseDate(), "Не изменилась дата релиза.");
     }
 
     @Test
@@ -165,8 +176,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         int filmId = film.getId();
         Film savedFilm = filmService.getFilmById(filmId);
@@ -179,8 +191,9 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         List<Film> films = filmService.getFilms();
         assertNotNull(films, "Фильмы не возвращаются.");
@@ -194,13 +207,14 @@ class FilmServiceTest {
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946,8,20));
+        user.setBirthday(LocalDate.of(1946, 8, 20));
         userStorage.crateUser(user);
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         filmService.addLike(film.getId(), user.getId());
         List<Film> films = filmService.getFilms();
@@ -208,7 +222,7 @@ class FilmServiceTest {
         assertEquals(1, films.size(), "Неверное количество фильмов.");
         assertNotNull(films.get(0).getLikes(), "Нет лайков у фильма");
         assertEquals(1, films.get(0).getLikes().size(), "Неверное количество лайков.");
-        assertTrue(films.get(0).getLikes().contains(user.getId()), "Лайк не того пользователя");
+        assertTrue(films.get(0).getLikes().contains(user), "Лайк не того пользователя");
     }
 
     @Test
@@ -217,13 +231,14 @@ class FilmServiceTest {
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946,8,20));
+        user.setBirthday(LocalDate.of(1946, 8, 20));
         userStorage.crateUser(user);
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         filmService.addLike(film.getId(), user.getId());
         filmService.deleteLike(film.getId(), user.getId());
@@ -238,20 +253,22 @@ class FilmServiceTest {
         Film film = new Film();
         film.setName("nisi eiusmod");
         film.setDescription("adipisicing");
-        film.setReleaseDate(LocalDate.of(1967,3,25));
+        film.setReleaseDate(LocalDate.of(1967, 3, 25));
         film.setDuration(100);
+        film.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film);
         User user = new User();
         user.setEmail("mail@mail.ru");
         user.setLogin("dolore");
         user.setName("Nick Name");
-        user.setBirthday(LocalDate.of(1946,8,20));
+        user.setBirthday(LocalDate.of(1946, 8, 20));
         userStorage.crateUser(user);
         Film film1 = new Film();
         film1.setName("nisi eiusmod");
         film1.setDescription("adipisicing");
-        film1.setReleaseDate(LocalDate.of(1967,3,25));
+        film1.setReleaseDate(LocalDate.of(1967, 3, 25));
         film1.setDuration(100);
+        film1.setMpa(new Mpa(1, "G"));
         filmService.crateFilm(film1);
         filmService.addLike(film1.getId(), user.getId());
         List<Film> films = filmService.getPopularFilms(null);

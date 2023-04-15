@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @NotNull
     private int id;
@@ -20,18 +22,5 @@ public class User {
     @PastOrPresent
     @NotNull
     private LocalDate birthday;
-    private List<Integer> friends = new ArrayList<>();
-
-    public User() {
-
-    }
-
-    public User(int id, String login, String name, String email, LocalDate birthday, List<Integer> friends) {
-        this.id = id;
-        this.login = login;
-        this.name = name;
-        this.email = email;
-        this.birthday = birthday;
-        this.friends = friends;
-    }
+    private Set<User> friends = new HashSet<>();
 }

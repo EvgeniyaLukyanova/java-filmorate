@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.*;
@@ -76,11 +78,11 @@ public class FilmService {
         }
 
         if (film.getLikes() == null) {
-            Set<Integer> setLikes = new HashSet<>();
+            Set<User> setLikes = new HashSet<>();
             film.setLikes(setLikes);
         }
 
-        if (film.getLikes().add(userId)) {
+        if (film.getLikes().add(user)) {
             filmStorage.updateFilm(film);
         }
     }
@@ -99,7 +101,7 @@ public class FilmService {
         }
 
         if (film.getLikes() != null) {
-            if (film.getLikes().remove(userId)) {
+            if (film.getLikes().remove(user)) {
                 filmStorage.updateFilm(film);
             }
         }

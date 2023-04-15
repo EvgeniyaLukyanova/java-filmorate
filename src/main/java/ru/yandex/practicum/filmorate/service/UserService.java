@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,13 +66,13 @@ public class UserService {
         }
 
         if (user.getFriends() != null) {
-            if (!user.getFriends().contains(friendId)) {
-                user.getFriends().add(friendId);
+            if (!user.getFriends().contains(friendUser)) {
+                user.getFriends().add(friendUser);
                 userStorage.updateUser(user);
             }
         } else {
-            List<Integer> friends = new ArrayList<>();
-            friends.add(friendId);
+            Set<User> friends = new HashSet<>();
+            friends.add(friendUser);
             user.setFriends(friends);
             userStorage.updateUser(user);
         }
@@ -91,8 +92,8 @@ public class UserService {
         }
 
         if (user.getFriends() != null) {
-            if (user.getFriends().contains(friendId)) {
-                user.getFriends().remove((Integer) friendId);
+            if (user.getFriends().contains(friendUser)) {
+                user.getFriends().remove(friendUser);
                 userStorage.updateUser(user);
             }
         }
@@ -104,12 +105,8 @@ public class UserService {
             log.warn("Получение списка друзей. Пользователь с ид {} отсутствует в базе.", id);
             throw new NotFoundException(String.format("Пользователь с ид %s не найден", id));
         }
-        if (user.getFriends() != null) {
-            return user.getFriends().stream()
-                    .map(e -> userStorage.getUserById(e))
-                    .collect(Collectors.toList());
-        }
-        return new ArrayList<>();
+
+        return new ArrayList<>(user.getFriends());
     }
 
     public List<User> getCommonFriends(int id, int otherId) {
@@ -128,7 +125,6 @@ public class UserService {
         if (user.getFriends() != null && otherUser.getFriends() != null) {
             return user.getFriends().stream()
                     .filter(t -> otherUser.getFriends().contains(t))
-                    .map(e -> userStorage.getUserById(e))
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();

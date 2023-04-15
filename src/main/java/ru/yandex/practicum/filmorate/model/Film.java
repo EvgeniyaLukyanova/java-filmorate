@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     @NotNull
     private int id;
@@ -22,23 +27,8 @@ public class Film {
     @Positive
     private int duration;
     private int rate;
-    private Set<Integer> likes;
-    Mpa mpa;
-    List<Genre> genres;
-
-    public Film() {
-
-    }
-
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rate, Set<Integer> likes, Mpa mpa, List<Genre> genres) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.rate = rate;
-        this.likes = likes;
-        this.mpa = mpa;
-        this.genres = genres;
-    }
+    private Set<User> likes = new HashSet<>();
+    @NotNull
+    private Mpa mpa;
+    private Set<Genre> genres = new LinkedHashSet<>();
 }

@@ -3,12 +3,10 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-
 @Data
 @AllArgsConstructor
-public class Mpa {
-    @NotNull
-    private int id;
-    private String name;
+public class Friend {
+    private int user1Id;
+    private int user2Id;
+    private boolean confirmation;
 }

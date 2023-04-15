@@ -7,16 +7,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,6 +31,13 @@ public class FilmDbStorage implements FilmStorage {
     @Autowired
     GenreStorage genreStorage;
 
+    @Autowired
+    LikeStorage likeStorage;
+
+    @Autowired
+    @Qualifier("UserDbStorage")
+    UserStorage userStorage;
+
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -39,17 +46,19 @@ public class FilmDbStorage implements FilmStorage {
         Integer id = resultSet.getInt("id");
         String name = resultSet.getString("name");
         String description = resultSet.getString("description");
-        LocalDate release =  resultSet.getDate("release").toLocalDate();
+        LocalDate release = resultSet.getDate("release").toLocalDate();
         int duration = resultSet.getInt("duration");
         int rate = resultSet.getInt("rate");
 
-        List<Integer> likes = getLikes(id);
+        Set<User> likes = likeStorage.getLikeByFilmId(id).stream()
+                .map(e -> userStorage.getUserById(e.getUserId()))
+                .collect(Collectors.toSet());
 
         Mpa mpa = mpaStorage.getMpaById(resultSet.getInt("mpa_id"));
 
-        List<Genre> genres = getGenresByIdFilm(id);
+        Set<Genre> genres = getGenresByIdFilm(id);
 
-        return new Film(id, name, description, release, duration, rate, new HashSet<Integer>(likes), mpa, genres);
+        return new Film(id, name, description, release, duration, rate, likes, mpa, genres);
     }
 
     @Override
@@ -111,24 +120,26 @@ public class FilmDbStorage implements FilmStorage {
                         return stmt;
                     });
 
-            List<Integer> likes = getLikes(film.getId());
+            Set<User> likes = likeStorage.getLikeByFilmId(film.getId()).stream()
+                    .map(e -> userStorage.getUserById(e.getUserId()))
+                    .collect(Collectors.toSet());
 
             if (film.getLikes() != null) {
-                for (Integer id : film.getLikes()) {
+                for (User user : film.getLikes()) {
                     if (likes != null) {
-                        if (!likes.contains(id)) {
-                            addLike(film.getId(), id);
+                        if (!likes.contains(user)) {
+                            likeStorage.createLike(new Like(film.getId(), user.getId()));
                         }
                     } else {
-                        addLike(film.getId(), id);
+                        likeStorage.createLike(new Like(film.getId(), user.getId()));
                     }
                 }
             }
 
-            for (Integer id : likes) {
+            for (User user : likes) {
                 if (film.getLikes() != null) {
-                    if (!film.getLikes().contains(id)) {
-                        deleteLike(film.getId(), id);
+                    if (!film.getLikes().contains(user)) {
+                        likeStorage.deleteLike(new Like(film.getId(), user.getId()));
                     }
                 }
             }
@@ -176,23 +187,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> mapRowToFilm(resultSet));
     }
 
-    public void addLike(int id, int userId) {
-        String sqlQuery = "insert into \"likes\" (\"film_id\", \"user_id\") values (?,?)";
-        jdbcTemplate.update(sqlQuery, id, userId);
-    }
-
-    public void deleteLike(int id, int userId) {
-        String sqlQuery = "delete from \"likes\" where \"film_id\" = ? and \"user_id\" = ?";
-        jdbcTemplate.update(sqlQuery, id, userId);
-    }
-
-    public List<Integer> getLikes(int id) {
-        String sqlQuery = "select \"user_id\" from \"likes\" where \"film_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
-            return resultSet.getInt("user_id");
-            }, id);
-    }
-
     public void addGenre(int filmId, int genreId) {
         String sqlQuery = "insert into \"film_genres\" (\"film_id\", \"genre_id\") values (?,?)";
         jdbcTemplate.update(sqlQuery, filmId, genreId);
@@ -207,15 +201,15 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "select \"genre_id\" from \"film_genres\" where \"film_id\" = ?";
         return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> {
             return resultSet.getInt("genre_id");
-            }, id);
+        }, id);
     }
 
     private Genre mapRowToGenre(ResultSet resultSet) throws SQLException {
         return genreStorage.getGenreById(resultSet.getInt("genre_id"));
     }
 
-    public List<Genre> getGenresByIdFilm(int id) {
-        String sqlQuery = "select * from \"film_genres\" where \"film_id\" = ?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> mapRowToGenre(resultSet), id);
+    public Set<Genre> getGenresByIdFilm(int id) {
+        String sqlQuery = "select * from \"film_genres\" where \"film_id\" = ? order by \"id\"";
+        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) -> mapRowToGenre(resultSet), id).stream().collect(Collectors.toSet());
     }
 }
